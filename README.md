@@ -27,7 +27,7 @@
 1. 添加依赖
 ```
 dependencies {
-      implementation 'com.github.Theoneee:Loader:Tag'
+      implementation 'com.github.Theoneee:Loader:0.0.1-beta'
 }
 ```
 2. 定义Callback
@@ -93,20 +93,20 @@ fun LoaderView.showErrorPage(
 
 ```kotlin
 
-        val mLoader = Loader.getDefault().register(registerView)
+  val mLoader = Loader.getDefault().register(registerView)
 
-        mLoader.run {
-            showLoadingPage("加载中")
-            delay(2000) {
-                showErrorPage("当前无网络，请检查网络状态") {
-                    showLoadingPage("再次加载中")
-                    delay(1000) {
-                        showSuccessPage()
-                    }
-                }
-            }
+  mLoader.run {
+      showLoadingPage("加载中")
+      delay(2000) {
+          showErrorPage("当前无网络，请检查网络状态") {
+              showLoadingPage("再次加载中")
+              delay(1000) {
+                  showSuccessPage()
+              }
+          }
+      }
 
-        }
+  }
 
 ```
 
