@@ -1,3 +1,4 @@
+import android.view.ViewGroup
 import com.theone.loader.callback.Callback
 
 
@@ -28,4 +29,5 @@ import com.theone.loader.callback.Callback
 class SuccessCallback: Callback() {
 
     override fun layoutId(): Int  = 0
+
 }

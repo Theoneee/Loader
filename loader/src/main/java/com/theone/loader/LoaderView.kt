@@ -2,6 +2,7 @@ package com.theone.loader
 
 import SuccessCallback
 import android.content.Context
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -39,8 +40,6 @@ class LoaderView {
 
     private val TAG = this.javaClass.simpleName
 
-    private var mLayoutInflater: LayoutInflater? = null
-
     private val callbacks = mutableListOf<Callback>()
 
     private var preCallback: Class<out Callback>? = null
@@ -55,7 +54,7 @@ class LoaderView {
 
     fun getCurrentCallback() = curCallback
 
-    fun showSuccessPage() = show(SuccessCallback::class.java)
+    fun showSuccessPage() = showCallbackView(SuccessCallback::class.java)
 
     fun register(target: View, builder: Loader.Builder?): LoaderView {
         if (null != rootView) {
@@ -88,7 +87,7 @@ class LoaderView {
             for (callback in getCallbacks()) {
                 callbacks.add(callback.newInstance())
             }
-            show(getDefaultCallback())
+            showCallbackView(getDefaultCallback())
         }
         return this
     }
@@ -100,22 +99,7 @@ class LoaderView {
         return rootView as ViewGroup
     }
 
-    private fun Callback.ensureCallbackView(): View? {
-        if (null == view) {
-            val layoutId = layoutId()
-            if (layoutId != 0) {
-                rootView?.run {
-                    val inflater = mLayoutInflater ?: LayoutInflater.from(context)
-                    view = inflater.inflate(layoutId, this, false)
-                }
-            } else {
-                throw IllegalArgumentException("${this.javaClass.simpleName} must have a valid layoutResource")
-            }
-        }
-        return view
-    }
-
-    fun show(
+    fun showCallbackView(
         status: Class<out Callback>?,
         transport: ((context: Context, view: View?) -> Unit)? = null
     ) {
@@ -127,7 +111,19 @@ class LoaderView {
                 return
             }
         }
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            show(status, transport)
+        } else {
+            ensureRootView().post {
+                show(status, transport)
+            }
+        }
+    }
 
+    private fun show(
+        status: Class<out Callback>,
+        transport: ((context: Context, view: View?) -> Unit)? = null
+    ) {
         for (item in callbacks) {
             if (item.javaClass == status) {
                 preCallback = status
@@ -143,7 +139,7 @@ class LoaderView {
                     }
                 } else {
                     with(item) {
-                        ensureCallbackView()?.let {
+                        ensureView(ensureRootView()).let {
                             replaceContentWithView(it)
                             transport?.invoke(it.context, it)
                         }
