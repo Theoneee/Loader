@@ -10,8 +10,8 @@
 
 
 ### 优化
-1. `Loader`使用`targetView`的`layoutParams`，将`Loading`，`Error`等状态页面直接显示到`targetView`位置，并处理`ConstraintLayout`布局问题。
-2. `Callback`的`View`需要的时候才进行`inflate`加载，减少时间。
+
+ `Loader`使用`targetView`的`layoutParams`，将`Loading`，`Error`等状态页面直接显示到`targetView`位置，并处理`ConstraintLayout`布局问题。
 
 
 ### Demo
@@ -20,7 +20,9 @@
 
 ### 使用
 
-目前测试阶段.... 慎用
+**目前测试阶段.... 慎用**
+
+和`LoadSir`使用基本一样
 
 1. 添加依赖
 ```
