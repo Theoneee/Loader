@@ -1,7 +1,18 @@
 plugins {
     id 'com.android.library'
+    id 'maven-publish'
+    id 'kotlin-android'
 }
-apply plugin: 'kotlin-android'
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+            }
+        }
+    }
+}
 
 android {
     compileSdk 31
@@ -31,6 +42,6 @@ android {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.0'
-    implementation "androidx.core:core-ktx:+"
+    implementation 'androidx.core:core-ktx:1.7.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
