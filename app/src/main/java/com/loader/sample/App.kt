@@ -1,5 +1,6 @@
 package com.loader.sample
 
+import SuccessCallback
 import android.app.Application
 import com.loader.sample.callback.ErrorCallback
 import com.loader.sample.callback.LoadingCallback
@@ -36,6 +37,7 @@ class App : BaseApplication() {
         Loader.beginBuilder()
             .addCallback(LoadingCallback::class.java)
             .addCallback(ErrorCallback::class.java)
+            .defaultCallback(SuccessCallback::class.java)
             .commit()
     }
 

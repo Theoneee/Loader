@@ -37,22 +37,22 @@ class MainActivity : BaseVmDbActivity<BaseViewModel, ActivityMainBinding>() {
 
     private lateinit var ROOT: QMUICommonListItemView
     private lateinit var CONTENT: QMUICommonListItemView
-    private lateinit var CENTER: QMUICommonListItemView
+    private lateinit var VIEW: QMUICommonListItemView
 
     override fun initView(root: View) {
         getTopBar()?.setTitle("Loader")
 
         getDataBinding().groupListView.run {
-            ROOT = createItem("ROOT")
-            CONTENT = createItemView("CONTENT")
-            CENTER = createItemView("CENTER")
+            ROOT = createItem("Root")
+            CONTENT = createItemView("Content")
+            VIEW = createItemView("View")
 
 
-            addToGroup(ROOT, CONTENT, CENTER,title = "") {
+            addToGroup(ROOT, CONTENT, VIEW,title = "") {
                 val type = when (it) {
                     ROOT -> LoaderActivity.ROOT
                     CONTENT -> LoaderActivity.CONTENT
-                    else -> LoaderActivity.CENTER
+                    else -> LoaderActivity.VIEW
                 }
                 val name = (it as QMUICommonListItemView).text
                 LoaderActivity.start(this@MainActivity, type,name.toString())

@@ -49,7 +49,7 @@ class LoaderView {
 
     private var rootView: ViewGroup? = null
 
-    private var contentView: View? = null
+    private var successCallback: SuccessCallback? = null
 
     private var loaderParams: ViewGroup.LayoutParams? = null
 
@@ -64,8 +64,10 @@ class LoaderView {
         val parent = target.parent
         rootView = when {
             parent is ViewGroup -> {
-                contentView = target
-                preView = contentView
+                successCallback = SuccessCallback().apply {
+                    view = target
+                }
+                preView = successCallback?.view
                 parent
             }
             target is ViewGroup -> {
@@ -79,6 +81,9 @@ class LoaderView {
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         )
+        successCallback?.let {
+            callbacks.add(it)
+        }
         builder?.run {
             for (callback in getCallbacks()) {
                 callbacks.add(callback.newInstance())
@@ -95,7 +100,7 @@ class LoaderView {
         return rootView as ViewGroup
     }
 
-    private fun Callback.ensureCallbackView(): View {
+    private fun Callback.ensureCallbackView(): View? {
         if (null == view) {
             val layoutId = layoutId()
             if (layoutId != 0) {
@@ -107,7 +112,7 @@ class LoaderView {
                 throw IllegalArgumentException("${this.javaClass.simpleName} must have a valid layoutResource")
             }
         }
-        return view!!
+        return view
     }
 
     fun show(
@@ -122,25 +127,26 @@ class LoaderView {
                 return
             }
         }
-        if (status == SuccessCallback::class.java) {
-            if (null == contentView) {
-                preView?.let {
-                    ensureRootView().removeViewInLayout(it)
-                }
-            } else {
-                contentView?.let {
-                    replaceContentWithView(it)
-                }
-            }
-            return
-        }
+
         for (item in callbacks) {
             if (item.javaClass == status) {
                 preCallback = status
-                with(item) {
-                    ensureCallbackView().let {
-                        replaceContentWithView(it)
-                        transport?.invoke(it.context, it)
+                if (status == SuccessCallback::class.java) {
+                    if (null == successCallback) {
+                        preView?.let {
+                            ensureRootView().removeViewInLayout(it)
+                        }
+                    } else {
+                        successCallback?.view?.let {
+                            replaceContentWithView(it)
+                        }
+                    }
+                } else {
+                    with(item) {
+                        ensureCallbackView()?.let {
+                            replaceContentWithView(it)
+                            transport?.invoke(it.context, it)
+                        }
                     }
                 }
                 break
@@ -153,20 +159,22 @@ class LoaderView {
 
     private fun replaceContentWithView(view: View) {
         with(ensureRootView()) {
-            if (contentView == null) {
+            if (successCallback == null) {
                 preView?.let {
                     removeViewInLayout(it)
                 }
                 addView(view, loaderParams)
             } else {
                 preView?.let {
+                    // 设置id,解决ConstraintLayout布局问题
                     val id = it.id
-                    if(id > 0){
+                    if (id > 0) {
                         view.id = id
                     }
                     val index = indexOfChild(it)
                     removeViewInLayout(it)
                     addView(view, index, loaderParams)
+                    // 某些机型addView后不执行此方法，这里手动执行下
                     requestApplyInsets()
                 }
             }

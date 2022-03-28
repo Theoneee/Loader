@@ -43,7 +43,7 @@ class LoaderActivity : BaseVmDbActivity<BaseViewModel, ActivityTestBinding>() {
 
         val ROOT = 0
         val CONTENT = 1
-        val CENTER = 2
+        val VIEW = 2
 
         private val TYPE = "type"
         private val NAME = "name"
