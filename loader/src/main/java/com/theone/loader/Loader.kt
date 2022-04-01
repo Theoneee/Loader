@@ -41,11 +41,10 @@ class Loader private constructor(){
 
     }
 
-    var builder: Builder? = null
-        private set
+    private var builder: Builder? = null
 
-    fun register(target:View):LoaderView{
-       return LoaderView().register(target,builder)
+    fun register(target:View,defaultCallback: Class<out Callback>? = null):LoaderView{
+        return LoaderView().register(target,builder,defaultCallback)
     }
 
     class Builder {

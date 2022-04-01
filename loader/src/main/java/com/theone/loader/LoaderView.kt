@@ -49,13 +49,13 @@ class LoaderView {
 
     private var loaderParams: ViewGroup.LayoutParams? = null
 
-    private var successId: Int = 0
+    private var loaderIndex = 1
 
     fun getCurrentCallback() = curCallback
 
     fun showSuccessPage() = showCallbackView(SuccessCallback::class.java)
 
-    fun register(target: View, builder: Loader.Builder?): LoaderView {
+    fun register(target: View, builder: Loader.Builder?,default: Class<out Callback>? = null): LoaderView {
         if (null != rootView) {
             throw RuntimeException("Loader has been registered.")
         }
@@ -64,22 +64,30 @@ class LoaderView {
             parent is ViewGroup -> {
                 successCallback = SuccessCallback().apply {
                     view = target
-                    callbacks.add(this)
                 }
-                successId = target.id
-//                preView = successCallback?.view
+                loaderIndex = parent.childCount
+                preView = target
                 parent
+            }
+            target is ViewGroup -> {
+                target
             }
             else -> {
                 throw RuntimeException("Loader target must have a parent")
             }
         }
-        loaderParams = target.layoutParams
+        loaderParams = target.layoutParams ?: ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        successCallback?.let {
+            callbacks.add(it)
+        }
         builder?.run {
             for (callback in getCallbacks()) {
                 callbacks.add(callback.newInstance())
             }
-            showCallbackView(getDefaultCallback())
+            showCallbackView(default?:getDefaultCallback())
         }
         return this
     }
@@ -119,25 +127,20 @@ class LoaderView {
         for (item in callbacks) {
             if (item.javaClass == status) {
                 preCallback = status
-                // 显示内容界面
                 if (status == SuccessCallback::class.java) {
-                    // 移除显示过的加载View
-                    preView?.let {
-                        ensureRootView().removeViewInLayout(it)
-                    }
-                    // 显示内容层，设置id
-                    successCallback?.view?.run {
-                        id = successId
-                        visibility = View.VISIBLE
+                    if (null == successCallback) {
+                        preView?.let {
+                            ensureRootView().removeViewInLayout(it)
+                        }
+                    } else {
+                        successCallback?.view?.let {
+                            replaceContentWithView(it)
+                        }
                     }
                 } else {
-                    // 显示状态界面
                     with(item) {
-                        // 获取状态界面，为null则创建
                         ensureView(ensureRootView()).let {
-                            // 替换
                             replaceContentWithView(it)
-                            // 传递给外部更改界面
                             transport?.invoke(it.context, it)
                         }
                     }
@@ -152,28 +155,27 @@ class LoaderView {
 
     private fun replaceContentWithView(view: View) {
         with(ensureRootView()) {
-            var index = 0
-            preView?.let {
-                index = indexOfChild(it)
-                removeViewInLayout(it)
-            }
-            successCallback?.view?.let {
-                it.visibility = View.GONE
-                id = NO_ID
-                // 设置id,解决ConstraintLayout布局问题
-                if (successId > 0) {
-                    view.id = id
+            if (successCallback == null) {
+                preView?.let {
+                    removeViewInLayout(it)
+                }
+                addView(view, loaderParams)
+            } else {
+                preView?.let {
+                    // 设置id,解决ConstraintLayout布局问题
+                    val id = it.id
+                    if (id > 0) {
+                        view.id = id
+                    }
+                    val index = indexOfChild(it)
+                    removeViewInLayout(it)
+                    addView(view, index, loaderParams)
+                    // 某些机型addView后不执行此方法，这里手动执行下
+                    requestApplyInsets()
                 }
             }
-            if (index > 0) {
-                addView(view, index, loaderParams)
-            } else {
-                addView(view, loaderParams)
-            }
-            // 某些机型addView后不执行此方法，这里手动执行下
-//                requestApplyInsets()
+            preView = view
         }
-        preView = view
     }
 
 }
