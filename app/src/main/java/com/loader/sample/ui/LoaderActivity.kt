@@ -3,6 +3,8 @@ package com.loader.sample.ui
 import android.app.Activity
 import android.content.Intent
 import android.view.View
+import com.loader.sample.callback.ErrorCallback
+import com.loader.sample.callback.LoadingCallback
 import com.loader.sample.databinding.ActivityTestBinding
 import com.loader.sample.delay
 import com.loader.sample.showErrorPage
@@ -48,7 +50,7 @@ class LoaderActivity : BaseVmDbActivity<BaseViewModel, ActivityTestBinding>() {
         private val TYPE = "type"
         private val NAME = "name"
 
-        fun start(activity: Activity, type: Int,name:String) {
+        fun start(activity: Activity, type: Int, name: String) {
             activity.startActivity(Intent(activity, LoaderActivity::class.java).apply {
                 putExtra(TYPE, type)
                 putExtra(NAME, name)
@@ -57,21 +59,19 @@ class LoaderActivity : BaseVmDbActivity<BaseViewModel, ActivityTestBinding>() {
 
     }
 
-
     override fun initView(root: View) {
         getTopBar()?.setTitle("Loader - ${intent.getStringExtra(NAME)}")
 
         val registerView = when (intent.getIntExtra(TYPE, ROOT)) {
             ROOT -> getViewConstructor().getRootView()
-            CONTENT -> getViewConstructor().getContentView()
+            CONTENT -> getDataBinding().root
             else -> getDataBinding().center
         }
 
-        val mLoader = Loader.getDefault().register(registerView)
+        val mLoader = Loader.getDefault().register(registerView, LoadingCallback::class.java)
 
-        mLoader.run {
-            showLoadingPage("加载中")
-            delay(2000) {
+        delay(2000) {
+            mLoader.run {
                 showErrorPage("当前无网络，请检查网络状态") {
                     showLoadingPage("再次加载中")
                     delay(1000) {
@@ -79,16 +79,7 @@ class LoaderActivity : BaseVmDbActivity<BaseViewModel, ActivityTestBinding>() {
                     }
                 }
             }
-
         }
     }
-
-    override fun hideProgress() {
-    }
-
-    override fun showProgress(progress: ProgressBean) {
-
-    }
-
 
 }

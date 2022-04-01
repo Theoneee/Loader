@@ -60,11 +60,4 @@ class MainActivity : BaseVmDbActivity<BaseViewModel, ActivityMainBinding>() {
         }
     }
 
-    override fun hideProgress() {
-    }
-
-
-    override fun showProgress(progress: ProgressBean) {
-    }
-
 }
