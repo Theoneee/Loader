@@ -45,7 +45,7 @@ class Loader private constructor(){
     private var builder: Builder? = null
         private set
 
-    fun register( target:View, default: Class<out Callback>?):LoaderService{
+    fun register( target:View, default: Class<out Callback>? = null):LoaderService{
         if(null == builder){
             throw RuntimeException("builder is null, please init it first.")
         }
