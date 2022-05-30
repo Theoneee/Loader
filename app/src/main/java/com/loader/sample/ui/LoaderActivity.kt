@@ -12,7 +12,6 @@ import com.loader.sample.showLoadingPage
 import com.theone.loader.Loader
 import com.theone.mvvm.base.activity.BaseVmDbActivity
 import com.theone.mvvm.base.viewmodel.BaseViewModel
-import com.theone.mvvm.entity.ProgressBean
 
 //  ┏┓　　　┏┓
 //┏┛┻━━━┛┻┓

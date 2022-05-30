@@ -2,6 +2,7 @@ package com.theone.loader
 
 import android.view.View
 import com.theone.loader.callback.Callback
+import java.lang.RuntimeException
 
 //  ┏┓　　　┏┓
 //┏┛┻━━━┛┻┓
@@ -42,23 +43,38 @@ class Loader private constructor(){
     }
 
     private var builder: Builder? = null
+        private set
 
-    fun register(target:View,defaultCallback: Class<out Callback>? = null):LoaderView{
-        return LoaderView().register(target,builder,defaultCallback)
+    fun register( target:View, default: Class<out Callback>?):LoaderService{
+        if(null == builder){
+            throw RuntimeException("builder is null, please init it first.")
+        }
+       return builder!!.getDefaultService().newInstance().register(target,builder,default)
     }
 
     class Builder {
 
         private val callbacks = mutableListOf<Class<out Callback>>()
         private var defaultCallback: Class<out Callback>? = null
+        private var defaultService:Class<out LoaderService> = LoaderReplaceService::class.java
 
-        fun addCallback(callback: Class<out Callback>):Builder {
+        fun addCallback(callback: Class<out Callback>): Builder {
+            for (cb in callbacks) {
+                if (cb == callback) {
+                    throw RuntimeException("${callback.name} have already added.")
+                }
+            }
             callbacks.add(callback)
             return this
         }
 
-        fun defaultCallback(default: Class<out Callback>?):Builder {
+        fun defaultCallback(default: Class<out Callback>?): Builder {
             defaultCallback = default
+            return this
+        }
+
+        fun defaultService(default: Class<out LoaderService>):Builder{
+            defaultService = default
             return this
         }
 
@@ -66,7 +82,12 @@ class Loader private constructor(){
 
         fun getDefaultCallback() = defaultCallback
 
+        fun getDefaultService() = defaultService
+
         fun commit() {
+            if (callbacks.isEmpty()) {
+                throw RuntimeException("callbacks is empty, please use addCallback method add your callback first.")
+            }
             getDefault().builder = this
         }
 

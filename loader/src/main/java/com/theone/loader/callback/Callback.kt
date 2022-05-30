@@ -34,13 +34,12 @@ abstract class Callback {
 
     var view: View? = null
 
-    fun ensureView(rootView:ViewGroup): View {
+    fun ensureView(rootView: ViewGroup): View {
         if (null == view) {
             val layoutId = layoutId()
             if (layoutId != 0) {
                 rootView.run {
-                    val inflater = LayoutInflater.from(context)
-                    view = inflater.inflate(layoutId, this, false)
+                    view = LayoutInflater.from(context).inflate(layoutId, this, false)
                 }
             } else {
                 throw IllegalArgumentException("${this.javaClass.simpleName} must have a valid layoutResource")

@@ -1,3 +1,5 @@
 /build
 /test
 /androidTest
+/src/androidTest/java/com/loader/sample/
+/src/test/java/com/loader/sample/

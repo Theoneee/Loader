@@ -4,10 +4,8 @@ import SuccessCallback
 import android.content.Context
 import android.os.Looper
 import android.view.View
-import android.view.View.NO_ID
 import android.view.ViewGroup
 import com.theone.loader.callback.Callback
-import java.lang.RuntimeException
 
 //  ┏┓　　　┏┓
 //┏┛┻━━━┛┻┓
@@ -28,61 +26,62 @@ import java.lang.RuntimeException
 //      ┗┻┛　┗┻┛
 /**
  * @author The one
- * @date 2022-03-25 09:51
+ * @date 2022-04-02 14:54
  * @describe TODO
  * @email 625805189@qq.com
- * @remark SuccessPage 直接 remove 还是 INVISIBLE/GONE ?
+ * @remark
  */
-class LoaderView {
+abstract class LoaderService {
 
     private val TAG = this.javaClass.simpleName
 
-    private val callbacks = mutableListOf<Callback>()
+    val callbacks = mutableListOf<Callback>()
 
-    private var preCallback: Class<out Callback>? = null
+    var preCallback: Class<out Callback>? = null
 
-    private var curCallback: Class<out Callback> = SuccessCallback::class.java
+    var curCallback: Class<out Callback> = SuccessCallback::class.java
 
-    private var rootView: ViewGroup? = null
+    var rootView: ViewGroup? = null
 
-    private var successCallback: SuccessCallback? = null
+    var preView: View? = null
 
-    private var loaderParams: ViewGroup.LayoutParams? = null
+    var successCallback: SuccessCallback? = null
 
-    private var loaderIndex = 1
+    var loaderParams: ViewGroup.LayoutParams? = null
+
+    var loaderId: Int = 0
 
     fun getCurrentCallback() = curCallback
 
     fun showSuccessPage() = showCallbackView(SuccessCallback::class.java)
 
-    fun register(target: View, builder: Loader.Builder?,default: Class<out Callback>? = null): LoaderView {
+    fun ensureRootView(): ViewGroup {
+        if (null == rootView) {
+            throw IllegalArgumentException("Loader must have a rootView")
+        }
+        return rootView as ViewGroup
+    }
+
+    fun register(target: View, builder: Loader.Builder?,default:Class<out Callback>?): LoaderService {
         if (null != rootView) {
             throw RuntimeException("Loader has been registered.")
         }
         val parent = target.parent
-        rootView = when {
-            parent is ViewGroup -> {
+        rootView = when (parent) {
+            is ViewGroup -> {
                 successCallback = SuccessCallback().apply {
                     view = target
+                    callbacks.add(this)
                 }
-                loaderIndex = parent.childCount
                 preView = target
                 parent
-            }
-            target is ViewGroup -> {
-                target
             }
             else -> {
                 throw RuntimeException("Loader target must have a parent")
             }
         }
-        loaderParams = target.layoutParams ?: ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        successCallback?.let {
-            callbacks.add(it)
-        }
+        loaderId= target.id
+        loaderParams = target.layoutParams
         builder?.run {
             for (callback in getCallbacks()) {
                 callbacks.add(callback.newInstance())
@@ -90,13 +89,6 @@ class LoaderView {
             showCallbackView(default?:getDefaultCallback())
         }
         return this
-    }
-
-    private fun ensureRootView(): ViewGroup {
-        if (null == rootView) {
-            throw IllegalArgumentException("Loader must have a rootView")
-        }
-        return rootView as ViewGroup
     }
 
     fun showCallbackView(
@@ -111,6 +103,9 @@ class LoaderView {
                 return
             }
         }
+        if (status == curCallback) {
+            return
+        }
         if (Looper.myLooper() == Looper.getMainLooper()) {
             show(status, transport)
         } else {
@@ -122,26 +117,20 @@ class LoaderView {
 
     private fun show(
         status: Class<out Callback>,
-        transport: ((context: Context, view: View?) -> Unit)? = null
+        transport: ((context: Context, view: View?) -> Unit)?
     ) {
         for (item in callbacks) {
             if (item.javaClass == status) {
                 preCallback = status
                 if (status == SuccessCallback::class.java) {
-                    if (null == successCallback) {
-                        preView?.let {
-                            ensureRootView().removeViewInLayout(it)
-                        }
-                    } else {
-                        successCallback?.view?.let {
-                            replaceContentWithView(it)
-                        }
+                    successCallback?.view?.let {
+                        showSuccessView(it)
                     }
                 } else {
                     with(item) {
                         ensureView(ensureRootView()).let {
-                            replaceContentWithView(it)
                             transport?.invoke(it.context, it)
+                            showLoaderView(it)
                         }
                     }
                 }
@@ -151,31 +140,8 @@ class LoaderView {
         curCallback = status
     }
 
-    private var preView: View? = null
+    abstract fun showSuccessView(view: View)
 
-    private fun replaceContentWithView(view: View) {
-        with(ensureRootView()) {
-            if (successCallback == null) {
-                preView?.let {
-                    removeViewInLayout(it)
-                }
-                addView(view, loaderParams)
-            } else {
-                preView?.let {
-                    // 设置id,解决ConstraintLayout布局问题
-                    val id = it.id
-                    if (id > 0) {
-                        view.id = id
-                    }
-                    val index = indexOfChild(it)
-                    removeViewInLayout(it)
-                    addView(view, index, loaderParams)
-                    // 某些机型addView后不执行此方法，这里手动执行下
-                    requestApplyInsets()
-                }
-            }
-            preView = view
-        }
-    }
+    abstract fun showLoaderView(view: View)
 
 }

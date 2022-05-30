@@ -5,7 +5,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.loader.sample.callback.ErrorCallback
 import com.loader.sample.callback.LoadingCallback
-import com.theone.loader.LoaderView
+import com.theone.loader.LoaderService
 
 //  ┏┓　　　┏┓
 //┏┛┻━━━┛┻┓
@@ -31,7 +31,7 @@ import com.theone.loader.LoaderView
  * @email 625805189@qq.com
  * @remark
  */
-fun LoaderView.showLoadingPage(msg: String? = null) {
+fun LoaderService.showLoadingPage(msg: String? = null) {
     showCallbackView(LoadingCallback::class.java){ _, view ->
         msg?.let {
             view?.findViewById<TextView>(R.id.loading_tips)?.text = it
@@ -39,7 +39,7 @@ fun LoaderView.showLoadingPage(msg: String? = null) {
     }
 }
 
-fun LoaderView.showErrorPage(
+fun LoaderService.showErrorPage(
     msg: String?,
     imageRes: Int = R.mipmap.status_loading_view_loading_fail,
     click: ((View) -> Unit)? = null

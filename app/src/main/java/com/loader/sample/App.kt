@@ -38,6 +38,8 @@ class App : BaseApplication() {
             .addCallback(LoadingCallback::class.java)
             .addCallback(ErrorCallback::class.java)
             .defaultCallback(SuccessCallback::class.java)
+            //.defaultService(LoaderReplaceService::class.java)
+            //.defaultService(LoaderVisibilityService::class.java)
             .commit()
     }
 
