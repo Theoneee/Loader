@@ -1,5 +1,4 @@
-import com.theone.loader.callback.Callback
-
+package com.theone.loader.callback
 
 //  ┏┓　　　┏┓
 //┏┛┻━━━┛┻┓

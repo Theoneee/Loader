@@ -1,11 +1,11 @@
 package com.theone.loader
 
-import SuccessCallback
 import android.content.Context
 import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
 import com.theone.loader.callback.Callback
+import com.theone.loader.callback.SuccessCallback
 
 //  ┏┓　　　┏┓
 //┏┛┻━━━┛┻┓

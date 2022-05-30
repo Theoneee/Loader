@@ -1,10 +1,10 @@
 package com.loader.sample
 
-import SuccessCallback
 import android.app.Application
 import com.loader.sample.callback.ErrorCallback
 import com.loader.sample.callback.LoadingCallback
 import com.theone.loader.Loader
+import com.theone.loader.callback.SuccessCallback
 import com.theone.mvvm.base.BaseApplication
 
 //  ┏┓　　　┏┓
