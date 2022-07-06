@@ -34,4 +34,20 @@
         android:layout_marginTop="20dp"/>
 
 
+    <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+        android:id="@+id/retry"
+        android:layout_width="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/stateContentTextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="点击重试"
+        app:qmui_backgroundColor="@color/qmui_config_color_gray_4"
+        android:textColor="@color/qmui_config_color_white"
+        android:paddingHorizontal="20dp"
+        app:qmui_isRadiusAdjustBounds="true"
+        app:qmui_borderWidth="0dp"
+        android:paddingVertical="8dp"
+        android:layout_height="wrap_content"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

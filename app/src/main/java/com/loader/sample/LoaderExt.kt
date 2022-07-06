@@ -1,6 +1,7 @@
 package com.loader.sample
 
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import com.loader.sample.callback.ErrorCallback
@@ -41,6 +42,7 @@ fun LoaderService.showLoadingPage(msg: String? = null) {
 
 fun LoaderService.showErrorPage(
     msg: String?,
+    retryMsg:String = "点击重试",
     imageRes: Int = R.mipmap.status_loading_view_loading_fail,
     click: ((View) -> Unit)? = null
 ) {
@@ -51,9 +53,14 @@ fun LoaderService.showErrorPage(
             }
             val ivStatus = findViewById<ImageView>(R.id.stateImageView)
             ivStatus.setImageResource(imageRes)
-            click?.let {
-                setOnClickListener(it)
+            findViewById<Button>(R.id.retry).run {
+                visibility = if(null == click) View.GONE else View.VISIBLE
+                click?.let {
+                    text = retryMsg
+                    setOnClickListener(it)
+                }
             }
+
         }
     }
 
