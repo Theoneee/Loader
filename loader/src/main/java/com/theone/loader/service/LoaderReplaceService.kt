@@ -1,7 +1,6 @@
-package com.theone.loader
+package com.theone.loader.service
 
 import android.view.View
-import android.view.View.*
 
 
 //  ┏┓　　　┏┓
@@ -24,43 +23,27 @@ import android.view.View.*
 /**
  * @author The one
  * @date 2022-03-25 09:51
- * @describe LoaderService
+ * @describe LoaderService2
  * @email 625805189@qq.com
- * TODO 将内容层VISIBLE/GONE的方式
+ * TODO 将内容层remove/add的方式
  */
 
-class LoaderVisibilityService : LoaderService() {
+class LoaderReplaceService: LoaderService() {
 
     override fun showSuccessView(view: View) {
-        preView?.let {
-            ensureRootView().removeViewInLayout(it)
-        }
-        view.run {
-            id = loaderId
-            visibility = VISIBLE
-        }
+       showLoaderView(view)
     }
 
     override fun showLoaderView(view: View) {
         with(ensureRootView()) {
-            successCallback?.view?.run {
-                if (preView == this) {
-                    preView = null
-                }
-                id = NO_ID
-                visibility = GONE
-            }
-            var index = 0
-            // 设置id,解决ConstraintLayout布局问题
-            view.id = loaderId
             preView?.let {
-                index = indexOfChild(it)
+                // 设置id,解决ConstraintLayout布局问题
+                view.id =  it.id
+                val index = indexOfChild(it)
                 removeViewInLayout(it)
-            }
-            if (index > 0) {
-                addView(view, index, loaderParams)
-            } else {
-                addView(view, loaderParams)
+                addView(view, index, successCallback?.view?.layoutParams)
+                // 某些机型addView后不执行此方法，这里手动执行下
+                requestApplyInsets()
             }
             preView = view
         }

@@ -1,9 +1,10 @@
-package com.theone.loader
+package com.theone.loader.service
 
 import android.content.Context
 import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
+import com.theone.loader.Loader
 import com.theone.loader.callback.Callback
 import com.theone.loader.callback.SuccessCallback
 
@@ -35,21 +36,21 @@ abstract class LoaderService {
 
     private val TAG = this.javaClass.simpleName
 
-    val callbacks = mutableListOf<Callback>()
+    private val callbacks = mutableListOf<Callback>()
 
-    var preCallback: Class<out Callback>? = null
+    private var preCallback: Class<out Callback>? = null
 
-    var curCallback: Class<out Callback> = SuccessCallback::class.java
+    private var curCallback: Class<out Callback> = SuccessCallback::class.java
 
-    var rootView: ViewGroup? = null
+    private var rootView: ViewGroup? = null
 
-    var preView: View? = null
+    protected var preView: View? = null
 
-    var successCallback: SuccessCallback? = null
+    protected var successCallback: SuccessCallback? = null
 
-    var loaderParams: ViewGroup.LayoutParams? = null
+    protected var loaderParams: ViewGroup.LayoutParams? = null
 
-    var loaderId: Int = 0
+    protected var loaderId: Int = 0
 
     fun getCurrentCallback() = curCallback
 
@@ -62,7 +63,7 @@ abstract class LoaderService {
         return rootView as ViewGroup
     }
 
-    fun register(target: View, builder: Loader.Builder?,default:Class<out Callback>?): LoaderService {
+    fun register(target: View, builder: Loader.Builder?, default:Class<out Callback>?): LoaderService {
         if (null != rootView) {
             throw RuntimeException("Loader has been registered.")
         }

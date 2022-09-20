@@ -2,6 +2,8 @@ package com.theone.loader
 
 import android.view.View
 import com.theone.loader.callback.Callback
+import com.theone.loader.service.LoaderReplaceService
+import com.theone.loader.service.LoaderService
 import java.lang.RuntimeException
 
 //  ┏┓　　　┏┓
@@ -43,9 +45,8 @@ class Loader private constructor(){
     }
 
     private var builder: Builder? = null
-        private set
 
-    fun register( target:View, default: Class<out Callback>? = null):LoaderService{
+    fun register( target:View, default: Class<out Callback>? = null): LoaderService {
         if(null == builder){
             throw RuntimeException("builder is null, please init it first.")
         }

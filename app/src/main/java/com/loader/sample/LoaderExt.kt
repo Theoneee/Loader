@@ -6,7 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.loader.sample.callback.ErrorCallback
 import com.loader.sample.callback.LoadingCallback
-import com.theone.loader.LoaderService
+import com.theone.loader.service.LoaderService
 
 //  ┏┓　　　┏┓
 //┏┛┻━━━┛┻┓
@@ -51,8 +51,7 @@ fun LoaderService.showErrorPage(
             msg?.let {
                 findViewById<TextView>(R.id.stateContentTextView).text = it
             }
-            val ivStatus = findViewById<ImageView>(R.id.stateImageView)
-            ivStatus.setImageResource(imageRes)
+            findViewById<ImageView>(R.id.stateImageView).setImageResource(imageRes)
             findViewById<Button>(R.id.retry).run {
                 visibility = if(null == click) View.GONE else View.VISIBLE
                 click?.let {
@@ -60,7 +59,6 @@ fun LoaderService.showErrorPage(
                     setOnClickListener(it)
                 }
             }
-
         }
     }
 

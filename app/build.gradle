@@ -15,7 +15,7 @@ android {
     }
 
     buildFeatures {
-        dataBinding = true
+        viewBinding = true
     }
 
     buildTypes {
@@ -34,8 +34,8 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
     implementation project(path: ':loader')
-    implementation 'com.github.Theoneee.QMUI-MVVM:base:1.0.4'
-    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
+    implementation 'com.github.Theoneee.QMUI-MVVM:base:1.0.9'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
 }

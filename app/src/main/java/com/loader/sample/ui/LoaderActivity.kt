@@ -9,7 +9,9 @@ import com.loader.sample.databinding.ActivityTestBinding
 import com.loader.sample.delay
 import com.loader.sample.showErrorPage
 import com.loader.sample.showLoadingPage
+import com.qmuiteam.qmui.widget.QMUITopBarLayout
 import com.theone.loader.Loader
+import com.theone.mvvm.base.activity.BaseVbActivity
 import com.theone.mvvm.base.activity.BaseVmDbActivity
 import com.theone.mvvm.base.viewmodel.BaseViewModel
 
@@ -37,7 +39,7 @@ import com.theone.mvvm.base.viewmodel.BaseViewModel
  * @email 625805189@qq.com
  * @remark
  */
-class LoaderActivity : BaseVmDbActivity<BaseViewModel, ActivityTestBinding>() {
+class LoaderActivity : BaseVbActivity<ActivityTestBinding>() {
 
 
     companion object {
@@ -58,13 +60,15 @@ class LoaderActivity : BaseVmDbActivity<BaseViewModel, ActivityTestBinding>() {
 
     }
 
-    override fun initView(root: View) {
-        getTopBar()?.setTitle("Loader - ${intent.getStringExtra(NAME)}")
+    override fun QMUITopBarLayout.initTopBar() {
+        setTitle("Loader - ${intent.getStringExtra(NAME)}")
+    }
 
+    override fun initView(root: View) {
         val registerView = when (intent.getIntExtra(TYPE, ROOT)) {
             ROOT -> getViewConstructor().getRootView()
-            CONTENT -> getDataBinding().root
-            else -> getDataBinding().center
+            CONTENT -> getViewBinding().root
+            else -> getViewBinding().center
         }
 
         val mLoader = Loader.getDefault().register(registerView, LoadingCallback::class.java)
