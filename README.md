@@ -27,7 +27,7 @@
 1. 添加依赖
 ```
 dependencies {
-      implementation 'com.github.Theoneee:Loader:0.0.1-beta'
+      implementation 'com.github.Theoneee:Loader:0.0.3-beta'
 }
 ```
 2. 定义Callback
